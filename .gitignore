@@ -1,3 +1,4 @@
 venv/
 template.py
 artifacts/
+logs/
