@@ -2,7 +2,7 @@
 
 ##  Overview
 
-This Text Summarizer leverages **Large Language Models (LLMs)** from huggingface to generate concise, coherent summaries from longer text passages. Built on the foundation of transformer-based LLMs, this project demonstrates the power of fine-tuning pre-trained language models for specific NLP task.
+This Text Summarizer leverages **Large Language Models (LLMs)** from huggingface to generate concise, coherent summaries from longer text passages. Built on the foundation of transformer-based LLMs, this project demonstrates the power of fine-tuning pre-trained large language models for a specific NLP task.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ This Text Summarizer leverages **Large Language Models (LLMs)** from huggingface
 
 
 ### LLM Fine-tuning Approach
-The application uses a **fine-tuned LLM** based on the `Falconsai/text_summarization` model, which is a pre-trained transformer model from huggingface specifically designed for text summarization tasks. Through careful fine-tuning on the SAMSum dataset (containing dialogue-summary pairs), the model learns to:
+The application uses a **LLM** based on the `Falconsai/text_summarization` model, which is a pre-trained transformer model from huggingface specifically designed for text summarization tasks. Through additional fine-tuning using the SAMSum dataset (containing dialogue-summary pairs), the model learns to:
 - Understand context and extract key information from conversations
 - Generate human-like summaries that preserve meaning and coherence
 - Adapt to the specific domain of dialogue summarization
