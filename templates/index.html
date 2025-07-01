@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Text Summarizer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .output-section {
+            margin-top: 40px;
+            display: none;
+        }
+
+        .output-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .output-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .output-text {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e1e5e9;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            flex: 1;
+            border: 1px solid #e1e5e9;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> AI Text Summarizer</h1>
+            <p>Transform long text into concise, meaningful summaries using advanced AI</p>
+        </div>
+
+        <div class="main-content">
+            <div class="alert" id="alert"></div>
+
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="inputText">
+                        <i class="fas fa-edit"></i> Enter your text to summarize:
+                    </label>
+                    <textarea 
+                        id="inputText" 
+                        name="text" 
+                        placeholder="Paste your text here... (minimum 50 characters recommended for better results)"
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-primary" onclick="summarizeText()">
+                        <i class="fas fa-magic"></i> Generate Summary
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="clearAll()">
+                        <i class="fas fa-trash"></i> Clear All
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="trainModel()">
+                        <i class="fas fa-cog"></i> Train Model
+                    </button>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating your summary...</p>
+            </div>
+
+            <div class="output-section" id="outputSection">
+                <div class="output-card">
+                    <h3>
+                        <i class="fas fa-file-alt"></i> Generated Summary
+                    </h3>
+                    <div class="output-text" id="summaryOutput"></div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="originalLength">0</div>
+                        <div class="stat-label">Original Words</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="summaryLength">0</div>
+                        <div class="stat-label">Summary Words</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="compressionRatio">0%</div>
+                        <div class="stat-label">Compression Ratio</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function summarizeText() {
+            const inputText = document.getElementById('inputText').value.trim();
+            
+            if (!inputText) {
+                showAlert('Please enter some text to summarize', 'error');
+                return;
+            }
+
+            if (inputText.length < 10) {
+                showAlert('Please enter at least 10 characters for better results', 'error');
+                return;
+            }
+
+            showLoading(true);
+            hideAlert();
+
+            try {
+                const formData = new FormData();
+                formData.append('text', inputText);
+
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    displaySummary(result.summary, inputText);
+                    showAlert('Summary generated successfully!', 'success');
+                } else {
+                    showAlert(result.message || 'Error generating summary', 'error');
+                }
+            } catch (error) {
+                showAlert('Network error. Please try again.', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displaySummary(summary, originalText) {
+            document.getElementById('summaryOutput').textContent = summary;
+            document.getElementById('outputSection').style.display = 'block';
+
+            // Calculate statistics
+            const originalWords = originalText.split(/\s+/).length;
+            const summaryWords = summary.split(/\s+/).length;
+            const compressionRatio = Math.round(((originalWords - summaryWords) / originalWords) * 100);
+
+            document.getElementById('originalLength').textContent = originalWords;
+            document.getElementById('summaryLength').textContent = summaryWords;
+            document.getElementById('compressionRatio').textContent = compressionRatio + '%';
+        }
+
+        async function trainModel() {
+            showAlert('Training model... This may take a while.', 'success');
+            
+            try {
+                const response = await fetch('/train');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showAlert('Model training completed successfully!', 'success');
+                } else {
+                    showAlert(result.message || 'Error during training', 'error');
+                }
+            } catch (error) {
+                showAlert('Error during training. Please try again.', 'error');
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputSection').style.display = 'none';
+            hideAlert();
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+        }
+
+        function hideAlert() {
+            document.getElementById('alert').style.display = 'none';
+        }
+
+        // Auto-resize textarea
+        document.getElementById('inputText').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.max(200, this.scrollHeight) + 'px';
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                summarizeText();
+            }
+        });
+    </script>
+</body>
+</html> 
